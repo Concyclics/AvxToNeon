@@ -937,6 +937,35 @@ FORCE_INLINE __m256i _mm256_permute2f128_si256 (__m256i a, __m256i b, int imm8)
     return res;
 }
 
+FORCE_INLINE __m256i _mm256_set_epi8(
+    int8_t e0,  int8_t e1,  int8_t e2,  int8_t e3,
+    int8_t e4,  int8_t e5,  int8_t e6,  int8_t e7,
+    int8_t e8,  int8_t e9,  int8_t e10, int8_t e11,
+    int8_t e12, int8_t e13, int8_t e14, int8_t e15,
+    int8_t e16, int8_t e17, int8_t e18, int8_t e19,
+    int8_t e20, int8_t e21, int8_t e22, int8_t e23,
+    int8_t e24, int8_t e25, int8_t e26, int8_t e27,
+    int8_t e28, int8_t e29, int8_t e30, int8_t e31
+    )
+{
+    __m256i res_m256i;
+
+    const int8_t hi128[16] = {
+        e31, e30, e29, e28, e27, e26, e25, e24,
+        e23, e22, e21, e20, e19, e18, e17, e16
+    };
+
+    const int8_t lo128[16] = {
+        e15, e14, e13, e12, e11, e10, e9,  e8,
+        e7,  e6,  e5,  e4,  e3,  e2,  e1,  e0
+    };
+
+    res_m256i.vect_s8[0] = vld1q_s8(hi128);
+    res_m256i.vect_s8[1] = vld1q_s8(lo128);
+
+    return res_m256i;
+}
+
 FORCE_INLINE __m256i _mm256_set_epi32(int e7, int e6, int e5, int e4, int e3, int e2, int e1, int e0)
 {
     __m256i res_m256i;
