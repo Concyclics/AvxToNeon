@@ -1063,6 +1063,17 @@ FORCE_INLINE __m128i _mm_slli_epi32 (__m128i a, int imm8)
     return res;
 }
 
+FORCE_INLINE __m128i _mm_srli_epi32(__m128i a, int imm8)
+{
+    __m128i res;
+    if (imm8 > 31) {
+        res.vect_u32 = vdupq_n_u32(0);
+    } else {
+        res.vect_u32 = vshrq_n_u32(a.vect_u32, imm8);
+    }
+    return res;
+}
+
 FORCE_INLINE __m128i _mm_slli_epi64 (__m128i a, int imm8)
 {
     __m128i res;
@@ -1145,6 +1156,21 @@ FORCE_INLINE __m128i _mm_shuffle_epi8(__m128i a,__m128i b)
     return res;
 }
 
+FORCE_INLINE __m128i _mm_shuffle_epi32(__m128i a, int imm8)
+{
+    uint32x4_t tbl = a.vect_u32;
+    uint32x4_t res;
+
+    res = vsetq_lane_u32(vgetq_lane_u32(tbl, (imm8 >> 0) & 0x3), res, 0);
+    res = vsetq_lane_u32(vgetq_lane_u32(tbl, (imm8 >> 2) & 0x3), res, 1);
+    res = vsetq_lane_u32(vgetq_lane_u32(tbl, (imm8 >> 4) & 0x3), res, 2);
+    res = vsetq_lane_u32(vgetq_lane_u32(tbl, (imm8 >> 6) & 0x3), res, 3);
+
+    __m128i out;
+    out.vect_u32 = res;
+    return out;
+}
+
 FORCE_INLINE void* _mm_malloc (size_t size, size_t align)
 {
     void *ptr;
@@ -1194,4 +1220,82 @@ FORCE_INLINE __m128i _mm_cmpgt_epi16(__m128i a, __m128i b)
 	__m128i dst;
 	dst.vect_u16 = vcgtq_s16(a.vect_s16, b.vect_s16);
 	return dst;
+}
+
+FORCE_INLINE __m128i _mm_set_epi8(
+    char e15, char e14, char e13, char e12,
+    char e11, char e10, char e9,  char e8,
+    char e7,  char e6,  char e5,  char e4,
+    char e3,  char e2,  char e1,  char e0) {
+    __m128i out;
+    out.vect_u8 = (uint8x16_t){
+        (uint8_t)e0,  (uint8_t)e1,  (uint8_t)e2,  (uint8_t)e3,
+        (uint8_t)e4,  (uint8_t)e5,  (uint8_t)e6,  (uint8_t)e7,
+        (uint8_t)e8,  (uint8_t)e9,  (uint8_t)e10, (uint8_t)e11,
+        (uint8_t)e12, (uint8_t)e13, (uint8_t)e14, (uint8_t)e15
+    };
+    return out;
+}
+
+FORCE_INLINE __m128i _mm_setr_epi16(
+    short e7, short e6, short e5, short e4,
+    short e3, short e2, short e1, short e0) {
+    __m128i out;
+    out.vect_u16 = (uint16x8_t){
+        (uint16_t)e7, (uint16_t)e6, (uint16_t)e5, (uint16_t)e4,
+        (uint16_t)e3, (uint16_t)e2, (uint16_t)e1, (uint16_t)e0
+    };
+    return out;
+}
+
+FORCE_INLINE __m128i _mm_setr_epi8(
+    char e15, char e14, char e13, char e12,
+    char e11, char e10, char e9,  char e8,
+    char e7,  char e6,  char e5,  char e4,
+    char e3,  char e2,  char e1,  char e0) {
+    __m128i out;
+    out.vect_u8 = (uint8x16_t){
+        (uint8_t)e15, (uint8_t)e14, (uint8_t)e13, (uint8_t)e12,
+        (uint8_t)e11, (uint8_t)e10, (uint8_t)e9,  (uint8_t)e8,
+        (uint8_t)e7,  (uint8_t)e6,  (uint8_t)e5,  (uint8_t)e4,
+        (uint8_t)e3,  (uint8_t)e2,  (uint8_t)e1,  (uint8_t)e0
+    };
+    return out;
+}
+
+FORCE_INLINE __m128i _mm_slli_epi16(__m128i a, int imm8) {
+    __m128i out;
+    if (imm8 > 15) {
+        out.vect_u16 = vdupq_n_u16(0);
+    } else {
+        out.vect_u16 = vshlq_n_u16(a.vect_u16, imm8);
+    }
+    return out;
+}
+
+FORCE_INLINE __m128i _mm_srai_epi16(__m128i a, int imm8) {
+    __m128i out;
+    if (imm8 > 15) {
+        int16x8_t sign = vshrq_n_s16(a.vect_s16, 15);
+        out.vect_s16 = vsubq_s16(vdupq_n_s16(0), sign); // all 1s if negative, 0 if positive
+    } else {
+        out.vect_s16 = vshrq_n_s16(a.vect_s16, imm8);
+    }
+    return out;
+}
+
+FORCE_INLINE __m128i _mm_srli_epi16(__m128i a, int imm8) {
+    __m128i out;
+    if (imm8 > 15) {
+        out.vect_u16 = vdupq_n_u16(0);
+    } else {
+        out.vect_u16 = vshrq_n_u16(a.vect_u16, imm8);
+    }
+    return out;
+}
+
+FORCE_INLINE __m128i _mm_add_epi32(__m128i a, __m128i b) {
+    __m128i out;
+    out.vect_u32 = vaddq_u32(a.vect_u32, b.vect_u32);
+    return out;
 }
