@@ -27,5 +27,8 @@
 #include "avxintrin.h"
 #include "avx512intrin.h"
 #include "immintrin.h"
+#include "wmmintrin.h"
+#include "smmintrin.h"
+#include "pmmintrin.h"
 
 #endif
